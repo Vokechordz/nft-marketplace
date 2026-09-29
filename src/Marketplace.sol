@@ -6,7 +6,6 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract Marketplace {
-
     using SafeERC20 for IERC20;
 
     error PriceMustBeGreaterThanZero();
@@ -27,12 +26,7 @@ contract Marketplace {
 
     mapping(uint256 => Listing) public listings;
 
-    event NFTListed(
-        address indexed seller,
-        address indexed nftAddress,
-        uint256 indexed tokenId,
-        uint256 price
-    );
+    event NFTListed(address indexed seller, address indexed nftAddress, uint256 indexed tokenId, uint256 price);
 
     event NFTSold(
         address indexed buyer,
@@ -43,27 +37,15 @@ contract Marketplace {
         uint256 fee
     );
 
-    event ListingCancelled(
-        address indexed seller,
-        address indexed nftAddress,
-        uint256 indexed tokenId
-    );
+    event ListingCancelled(address indexed seller, address indexed nftAddress, uint256 indexed tokenId);
 
-    event FeeUpdated(
-        uint256 oldFee,
-        uint256 newFee
-    );
+    event FeeUpdated(uint256 oldFee, uint256 newFee);
 
     constructor() {
         owner = msg.sender;
     }
 
-    function listNFT(
-        address nftAddress,
-        uint256 tokenId,
-        uint256 price
-    ) public {
-
+    function listNFT(address nftAddress, uint256 tokenId, uint256 price) public {
         if (price == 0) {
             revert PriceMustBeGreaterThanZero();
         }
@@ -72,32 +54,14 @@ contract Marketplace {
             revert AlreadyListed();
         }
 
-        IERC721(nftAddress).transferFrom(
-            msg.sender,
-            address(this),
-            tokenId
-        );
+        IERC721(nftAddress).transferFrom(msg.sender, address(this), tokenId);
 
-        listings[tokenId] = Listing({
-            seller: msg.sender,
-            tokenId: tokenId,
-            price: price
-        });
+        listings[tokenId] = Listing({seller: msg.sender, tokenId: tokenId, price: price});
 
-        emit NFTListed(
-            msg.sender,
-            nftAddress,
-            tokenId,
-            price
-        );
+        emit NFTListed(msg.sender, nftAddress, tokenId, price);
     }
 
-    function buyNFT(
-        address nftAddress,
-        uint256 tokenId,
-        address paymentToken
-    ) public {
-
+    function buyNFT(address nftAddress, uint256 tokenId, address paymentToken) public {
         Listing memory listing = listings[tokenId];
 
         if (listing.seller == address(0)) {
@@ -107,41 +71,18 @@ contract Marketplace {
         uint256 fee = (listing.price * feePercent) / 100;
         uint256 sellerAmount = listing.price - fee;
 
-        IERC20(paymentToken).safeTransferFrom(
-            msg.sender,
-            owner,
-            fee
-        );
+        IERC20(paymentToken).safeTransferFrom(msg.sender, owner, fee);
 
-        IERC20(paymentToken).safeTransferFrom(
-            msg.sender,
-            listing.seller,
-            sellerAmount
-        );
+        IERC20(paymentToken).safeTransferFrom(msg.sender, listing.seller, sellerAmount);
 
-        IERC721(nftAddress).transferFrom(
-            address(this),
-            msg.sender,
-            tokenId
-        );
+        IERC721(nftAddress).transferFrom(address(this), msg.sender, tokenId);
 
-        emit NFTSold(
-            msg.sender,
-            listing.seller,
-            nftAddress,
-            tokenId,
-            listing.price,
-            fee
-        );
+        emit NFTSold(msg.sender, listing.seller, nftAddress, tokenId, listing.price, fee);
 
         delete listings[tokenId];
     }
 
-    function cancelListing(
-        address nftAddress,
-        uint256 tokenId
-    ) public {
-
+    function cancelListing(address nftAddress, uint256 tokenId) public {
         Listing memory listing = listings[tokenId];
 
         if (listing.seller == address(0)) {
@@ -152,25 +93,14 @@ contract Marketplace {
             revert NotSeller();
         }
 
-        IERC721(nftAddress).transferFrom(
-            address(this),
-            msg.sender,
-            tokenId
-        );
+        IERC721(nftAddress).transferFrom(address(this), msg.sender, tokenId);
 
-        emit ListingCancelled(
-            msg.sender,
-            nftAddress,
-            tokenId
-        );
+        emit ListingCancelled(msg.sender, nftAddress, tokenId);
 
         delete listings[tokenId];
     }
 
-    function setFeePercent(
-        uint256 _feePercent
-    ) public {
-
+    function setFeePercent(uint256 _feePercent) public {
         if (msg.sender != owner) {
             revert NotOwner();
         }
@@ -183,14 +113,9 @@ contract Marketplace {
 
         feePercent = _feePercent;
 
-        emit FeeUpdated(
-            oldFee,
-            _feePercent
-        );
+        emit FeeUpdated(oldFee, _feePercent);
     }
 }
-
-
 
 /* NFT Marketplace - Sepolia Deployment
 

@@ -7,7 +7,6 @@ import {MyNFT} from "../src/MyNFT.sol";
 import {PaymentToken} from "../src/PaymentToken.sol";
 
 contract MarketplaceTest is Test {
-
     Marketplace marketplace;
     MyNFT nft;
     PaymentToken token;
@@ -29,19 +28,11 @@ contract MarketplaceTest is Test {
         nft.approve(address(marketplace), 0);
 
         vm.prank(alice);
-        marketplace.listNFT(
-            address(nft),
-            0,
-            100
-        );
+        marketplace.listNFT(address(nft), 0, 100);
 
         assertEq(nft.ownerOf(0), address(marketplace));
 
-        (
-            address seller,
-            uint256 tokenId,
-            uint256 price
-        ) = marketplace.listings(0);
+        (address seller, uint256 tokenId, uint256 price) = marketplace.listings(0);
 
         assertEq(seller, alice);
         assertEq(tokenId, 0);
@@ -57,19 +48,10 @@ contract MarketplaceTest is Test {
 
         vm.expectEmit(true, true, true, true);
 
-        emit Marketplace.NFTListed(
-            alice,
-            address(nft),
-            0,
-            100
-        );
+        emit Marketplace.NFTListed(alice, address(nft), 0, 100);
 
         vm.prank(alice);
-        marketplace.listNFT(
-            address(nft),
-            0,
-            100
-        );
+        marketplace.listNFT(address(nft), 0, 100);
     }
 
     function testBuyNFT() public {
@@ -80,11 +62,7 @@ contract MarketplaceTest is Test {
         nft.approve(address(marketplace), 0);
 
         vm.prank(alice);
-        marketplace.listNFT(
-            address(nft),
-            0,
-            100
-        );
+        marketplace.listNFT(address(nft), 0, 100);
 
         token.mint(bob, 100);
 
@@ -92,11 +70,7 @@ contract MarketplaceTest is Test {
         token.approve(address(marketplace), 100);
 
         vm.prank(bob);
-        marketplace.buyNFT(
-            address(nft),
-            0,
-            address(token)
-        );
+        marketplace.buyNFT(address(nft), 0, address(token));
 
         assertEq(nft.ownerOf(0), bob);
         assertEq(token.balanceOf(alice), 98);
@@ -112,11 +86,7 @@ contract MarketplaceTest is Test {
         nft.approve(address(marketplace), 0);
 
         vm.prank(alice);
-        marketplace.listNFT(
-            address(nft),
-            0,
-            100
-        );
+        marketplace.listNFT(address(nft), 0, 100);
 
         token.mint(bob, 100);
 
@@ -125,21 +95,10 @@ contract MarketplaceTest is Test {
 
         vm.expectEmit(true, true, true, true);
 
-        emit Marketplace.NFTSold(
-            bob,
-            alice,
-            address(nft),
-            0,
-            100,
-            2
-        );
+        emit Marketplace.NFTSold(bob, alice, address(nft), 0, 100, 2);
 
         vm.prank(bob);
-        marketplace.buyNFT(
-            address(nft),
-            0,
-            address(token)
-        );
+        marketplace.buyNFT(address(nft), 0, address(token));
     }
 
     function testCancelListing() public {
@@ -150,25 +109,14 @@ contract MarketplaceTest is Test {
         nft.approve(address(marketplace), 0);
 
         vm.prank(alice);
-        marketplace.listNFT(
-            address(nft),
-            0,
-            100
-        );
+        marketplace.listNFT(address(nft), 0, 100);
 
         vm.prank(alice);
-        marketplace.cancelListing(
-            address(nft),
-            0
-        );
+        marketplace.cancelListing(address(nft), 0);
 
         assertEq(nft.ownerOf(0), alice);
 
-        (
-            address seller,
-            uint256 tokenId,
-            uint256 price
-        ) = marketplace.listings(0);
+        (address seller, uint256 tokenId, uint256 price) = marketplace.listings(0);
 
         assertEq(seller, address(0));
         assertEq(tokenId, 0);
@@ -183,25 +131,14 @@ contract MarketplaceTest is Test {
         nft.approve(address(marketplace), 0);
 
         vm.prank(alice);
-        marketplace.listNFT(
-            address(nft),
-            0,
-            100
-        );
+        marketplace.listNFT(address(nft), 0, 100);
 
         vm.expectEmit(true, true, true, true);
 
-        emit Marketplace.ListingCancelled(
-            alice,
-            address(nft),
-            0
-        );
+        emit Marketplace.ListingCancelled(alice, address(nft), 0);
 
         vm.prank(alice);
-        marketplace.cancelListing(
-            address(nft),
-            0
-        );
+        marketplace.cancelListing(address(nft), 0);
     }
 
     function testCannotListNFTForZeroPrice() public {
@@ -211,16 +148,10 @@ contract MarketplaceTest is Test {
         vm.prank(alice);
         nft.approve(address(marketplace), 0);
 
-        vm.expectRevert(
-            Marketplace.PriceMustBeGreaterThanZero.selector
-        );
+        vm.expectRevert(Marketplace.PriceMustBeGreaterThanZero.selector);
 
         vm.prank(alice);
-        marketplace.listNFT(
-            address(nft),
-            0,
-            0
-        );
+        marketplace.listNFT(address(nft), 0, 0);
     }
 
     function testCannotCancelSomeoneElsesListing() public {
@@ -231,34 +162,19 @@ contract MarketplaceTest is Test {
         nft.approve(address(marketplace), 0);
 
         vm.prank(alice);
-        marketplace.listNFT(
-            address(nft),
-            0,
-            100
-        );
+        marketplace.listNFT(address(nft), 0, 100);
 
-        vm.expectRevert(
-            Marketplace.NotSeller.selector
-        );
+        vm.expectRevert(Marketplace.NotSeller.selector);
 
         vm.prank(bob);
-        marketplace.cancelListing(
-            address(nft),
-            0
-        );
+        marketplace.cancelListing(address(nft), 0);
     }
 
     function testCannotBuyNFTThatIsNotListed() public {
-        vm.expectRevert(
-            Marketplace.NFTNotListed.selector
-        );
+        vm.expectRevert(Marketplace.NFTNotListed.selector);
 
         vm.prank(bob);
-        marketplace.buyNFT(
-            address(nft),
-            0,
-            address(token)
-        );
+        marketplace.buyNFT(address(nft), 0, address(token));
     }
 
     function testCannotListNFTTwice() public {
@@ -269,28 +185,16 @@ contract MarketplaceTest is Test {
         nft.approve(address(marketplace), 0);
 
         vm.prank(alice);
-        marketplace.listNFT(
-            address(nft),
-            0,
-            100
-        );
+        marketplace.listNFT(address(nft), 0, 100);
 
-        vm.expectRevert(
-            Marketplace.AlreadyListed.selector
-        );
+        vm.expectRevert(Marketplace.AlreadyListed.selector);
 
         vm.prank(alice);
-        marketplace.listNFT(
-            address(nft),
-            0,
-            200
-        );
+        marketplace.listNFT(address(nft), 0, 200);
     }
 
     function testOnlyOwnerCanChangeFee() public {
-        vm.expectRevert(
-            Marketplace.NotOwner.selector
-        );
+        vm.expectRevert(Marketplace.NotOwner.selector);
 
         vm.prank(bob);
         marketplace.setFeePercent(5);
@@ -305,18 +209,13 @@ contract MarketplaceTest is Test {
     function testFeeUpdatedEvent() public {
         vm.expectEmit(false, false, false, true);
 
-        emit Marketplace.FeeUpdated(
-            2,
-            5
-        );
+        emit Marketplace.FeeUpdated(2, 5);
 
         marketplace.setFeePercent(5);
     }
 
     function testCannotSetFeeAbove10Percent() public {
-        vm.expectRevert(
-            Marketplace.FeeTooHigh.selector
-        );
+        vm.expectRevert(Marketplace.FeeTooHigh.selector);
 
         marketplace.setFeePercent(11);
     }

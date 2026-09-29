@@ -5,7 +5,6 @@ import {Test} from "forge-std/Test.sol";
 import {PaymentToken} from "../src/PaymentToken.sol";
 
 contract PaymentTokenTest is Test {
-
     PaymentToken token;
 
     address alice = address(1);

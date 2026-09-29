@@ -5,7 +5,6 @@ import {Test} from "forge-std/Test.sol";
 import {MyNFT} from "../src/MyNFT.sol";
 
 contract MyNFTTest is Test {
-
     MyNFT nft;
 
     address alice = address(1);
