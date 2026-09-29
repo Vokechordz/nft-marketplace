@@ -115,3 +115,40 @@ Run the tests with:
 
 ```bash
 forge test
+
+
+```
+
+## Sepolia Deployment
+
+The contracts have been deployed and verified on the Ethereum Sepolia testnet.
+
+### MyNFT
+
+Contract address:
+
+`0xcE57a195B057567647A21E6a481D38cc63f37F47`
+
+Etherscan:
+
+https://sepolia.etherscan.io/address/0xce57a195b057567647a21e6a481d38cc63f37f47
+
+### PaymentToken
+
+Contract address:
+
+`0x8ADe3678D17b39531f103c3c3473A9A9c87cbDf9`
+
+Etherscan:
+
+https://sepolia.etherscan.io/address/0x8ade3678d17b39531f103c3c3473a9a9c87cbdf9
+
+### Marketplace
+
+Contract address:
+
+`0xD7379C39Ac0cdf080f7450d93807e0deF73036c6`
+
+Etherscan:
+
+https://sepolia.etherscan.io/address/0xd7379c39ac0cdf080f7450d93807e0def73036c6
